@@ -48,22 +48,20 @@ class Controller extends BlockController
     {
         $args['photoID'] = ($args['photoID'] != '') ? intval($args['photoID']) : 0;
         //load the file by file ID
-        //check if the file was loaded
-        //get the path of the loaded file
-        //read the content of the file
-        //decode the gltf file
-        //change the uri
-        //encode the updated data
-        //put the updated data back to the directory
         $gltfFileID = File::getByID(39);
+        
+        //check if the file was loaded
         if (is_object($gltfFileID)) {
-            //$approved = $gltfFileID->getApprovedVersion();
+            
+            //get the path of the loaded file
             $modify = $gltfFileID->getVersionToModify();
             $gltfFile = $modify->getFile();
             $filePath = $gltfFile->getURL();
-
+            
+            //read the content of the file
             $gltfContent = file_get_contents($filePath);
             if (is_string($gltfContent)) {
+                //decode the gltf file
                 $data = json_decode($gltfContent, true);
             } else {
                 throw new Exception('There is an error.');
@@ -75,22 +73,21 @@ class Controller extends BlockController
                 throw new Exception('Invalid');
             }
             
-            
             //$data['buffers'][0]['uri'] = 'woolly-mammoth-100k-4096.bin';
+            //change the uri
             $data['buffers'][0]['uri'] = '38';
 
             if ($originalURI == $data['buffers'][0]['uri']) {
                 throw new Exception('Did not update.');
             }
 
-
+            //encode the updated data
             $updatedJson = json_encode($data, JSON_PRETTY_PRINT);
             
             $localFilePath = File::getRelativePathFromID(39);
             $trimmedPath = ltrim($localFilePath, '/');
-            //$fileHelper = new FileService();
-            //$fileHelper->updateFileContents($gltfFile, $updatedJson);
 
+            //put the updated data back to the directory
             file_put_contents($trimmedPath, $updatedJson);
         } else {
             throw new Exception('There is an error.');
